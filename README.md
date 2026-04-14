@@ -1,6 +1,6 @@
 # bods-gql
 
-Convert [Beneficial Ownership Data Standard (BODS)](https://standard.openownership.org/) v0.4 data for querying with [GQL](https://www.gqlstandards.org/) (ISO/IEC 39075) on Google BigQuery.
+Convert [Beneficial Ownership Data Standard (BODS)](https://standard.openownership.org/) version 0.4 data for querying with [GQL](https://www.gqlstandards.org/) (ISO/IEC 39075) on Google BigQuery.
 
 ## What this does
 
