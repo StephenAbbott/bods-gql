@@ -207,8 +207,22 @@ bods-gql/
 - Google Cloud BigQuery **Enterprise or Enterprise Plus** edition (required for graph queries)
 - Google Cloud credentials for BigQuery loading (`gcloud auth application-default login`)
 
+## Testing
+
+```bash
+pytest
+```
+
+### Conformance against the shared BODS v0.4 fixture pack
+
+`tests/test_bods_fixtures_conformance.py` runs the BODS-to-graph mapper against every case in the canonical [**bods-v04-fixtures**](https://pypi.org/project/bods-v04-fixtures/) pack via the [**pytest-bods-v04-fixtures**](https://pypi.org/project/pytest-bods-v04-fixtures/) plugin. Tests are parametrized by fixture name so a failure like `[edge-cases/10-circular-ownership]` points straight at the offending case.
+
+Graph-specific conformance checks include: `MappingResult.errors` stays empty across every canonical fixture (shape divergence caught before data lands in BigQuery); circular ownership emits two distinct mirrored edges; and declared-unknown UBOs (inline `unspecifiedReason`) survive into `interested_party_unspecified_json` rather than being silently dropped.
+
 ## Related projects
 
+- [bods-v04-fixtures](https://pypi.org/project/bods-v04-fixtures/) — canonical BODS v0.4 conformance fixture pack ([source](https://github.com/StephenAbbott/bods-fixtures))
+- [pytest-bods-v04-fixtures](https://pypi.org/project/pytest-bods-v04-fixtures/) — pytest plugin for parametrizing tests over the fixture pack ([source](https://github.com/StephenAbbott/pytest-bods-fixtures))
 - [bods-neo4j](https://github.com/StephenAbbott/bods-neo4j) — Bidirectional BODS v0.4 ↔ Neo4j converter with Cypher queries
 - [BODS v0.4 Standard](https://standard.openownership.org/)
 - [bodsdata](https://bods-data.openownership.org/) — BODS data analysis tools and BigQuery datasets
