@@ -2,6 +2,8 @@
 
 Convert [Beneficial Ownership Data Standard (BODS)](https://standard.openownership.org/) version 0.4 data for querying with [GQL](https://www.gqlstandards.org/) (ISO/IEC 39075) on Google BigQuery.
 
+Part of the [BODS Interoperability Toolkit](https://github.com/StephenAbbott/bods-interoperability-toolkit).
+
 ## What this does
 
 BODS publishes beneficial ownership information as JSON statements about **entities**, **persons**, and **relationships** between them. This tool maps that data into a **property graph** that can be queried with GQL — the ISO standard graph query language — on BigQuery.
