@@ -56,44 +56,37 @@ def info(bods_file: str, output_format: str):
 def to_csv(bods_file: str, output_dir: str):
     """Convert BODS file to CSV node/edge tables for BigQuery upload."""
     import csv
+    import dataclasses
+
+    from bods_gql.converter.mapper import EntityNode, OwnershipEdge, PersonNode
 
     statements = read_statements(bods_file)
     result = map_statements(statements)
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    # Write entity nodes
-    if result.entity_nodes:
-        entity_path = out / "entity_nodes.csv"
-        fields = list(result.entity_nodes[0].to_dict().keys())
-        with open(entity_path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
+    # Fieldnames come from the dataclass schema, NOT the first row's keys:
+    # to_dict() drops None values, so row key sets vary with the data — a
+    # later row can carry a column the first row lacked, and DictWriter
+    # raises on unknown keys ("dict contains fields not in fieldnames").
+    # The full schema also gives every export the same stable column set,
+    # matching the BigQuery loader schemas. restval="" fills the gaps.
+    tables = [
+        ("entity_nodes.csv", result.entity_nodes, EntityNode, "entity nodes"),
+        ("person_nodes.csv", result.person_nodes, PersonNode, "person nodes"),
+        ("ownership_edges.csv", result.ownership_edges, OwnershipEdge, "ownership edges"),
+    ]
+    for filename, rows, cls, label in tables:
+        if not rows:
+            continue
+        path = out / filename
+        fields = [f.name for f in dataclasses.fields(cls)]
+        with open(path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fields, restval="")
             writer.writeheader()
-            for node in result.entity_nodes:
-                writer.writerow(node.to_dict())
-        click.echo(f"Wrote {len(result.entity_nodes)} entity nodes to {entity_path}")
-
-    # Write person nodes
-    if result.person_nodes:
-        person_path = out / "person_nodes.csv"
-        fields = list(result.person_nodes[0].to_dict().keys())
-        with open(person_path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            for node in result.person_nodes:
-                writer.writerow(node.to_dict())
-        click.echo(f"Wrote {len(result.person_nodes)} person nodes to {person_path}")
-
-    # Write ownership edges
-    if result.ownership_edges:
-        edge_path = out / "ownership_edges.csv"
-        fields = list(result.ownership_edges[0].to_dict().keys())
-        with open(edge_path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            for edge in result.ownership_edges:
-                writer.writerow(edge.to_dict())
-        click.echo(f"Wrote {len(result.ownership_edges)} ownership edges to {edge_path}")
+            for row in rows:
+                writer.writerow(row.to_dict())
+        click.echo(f"Wrote {len(rows)} {label} to {path}")
 
     if result.errors:
         click.echo(f"WARNING: {len(result.errors)} statements could not be mapped", err=True)
