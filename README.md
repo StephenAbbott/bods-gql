@@ -59,11 +59,23 @@ The relationship's `interestedParty` becomes the edge **source** and `subject` b
 ## Installation
 
 ```bash
+# Core: BODS-to-CSV mapping, property graph DDL, GQL query generation.
+# Pure Python — no Google Cloud dependencies.
 pip install -e .
+
+# With the BigQuery loader (`bods-gql load`) — pulls in the Google Cloud
+# client stack (google-cloud-bigquery, bigquery-storage, pyarrow):
+pip install -e ".[bigquery]"
 
 # With dev dependencies (pytest)
 pip install -e ".[dev]"
 ```
+
+Only the `load` command talks to BigQuery. Converting BODS data to CSV,
+generating `CREATE PROPERTY GRAPH` DDL and generating GQL queries all work
+with the core install — you can upload the CSVs and run the DDL/queries in
+the BigQuery console yourself. Without the extra, `bods-gql load` exits with
+a message pointing at `pip install 'bods-gql[bigquery]'`.
 
 ## Quick start
 

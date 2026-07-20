@@ -25,12 +25,18 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.0",
+]
+
+[project.optional-dependencies]
+# The BigQuery loader (`bods-gql load` / converter.bigquery_loader) needs the
+# Google Cloud client stack (~100MB of wheels). Everything else — the
+# BODS-to-CSV mapper, the property-graph DDL and the GQL query generators —
+# is pure Python, so the Google deps are opt-in.
+bigquery = [
     "google-cloud-bigquery>=3.0",
     "google-cloud-bigquery-storage>=2.0",
     "pyarrow>=14.0",
 ]
-
-[project.optional-dependencies]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

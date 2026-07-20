@@ -188,9 +188,13 @@ def query(dataset: str, graph_name: str, query_type: str, max_depth: int, thresh
 def load(bods_file: str, project: str, dataset: str, graph_name: str, location: str):
     """Load BODS file into BigQuery and create property graph.
 
-    Requires google-cloud-bigquery credentials configured.
+    Requires google-cloud-bigquery credentials configured, and the optional
+    BigQuery dependencies: pip install 'bods-gql[bigquery]'.
     """
-    from bods_gql.converter.bigquery_loader import BigQueryLoader
+    try:
+        from bods_gql.converter.bigquery_loader import BigQueryLoader
+    except ImportError as exc:
+        raise click.ClickException(str(exc)) from exc
 
     click.echo(f"Reading BODS file: {bods_file}")
     statements = read_statements(bods_file)
