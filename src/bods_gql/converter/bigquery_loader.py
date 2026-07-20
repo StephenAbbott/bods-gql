@@ -8,7 +8,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from google.cloud import bigquery
+try:
+    from google.cloud import bigquery
+except ImportError as exc:  # pragma: no cover — exercised via a blocked import in tests
+    raise ImportError(
+        "The BigQuery loader needs the optional Google Cloud dependencies. "
+        "Install them with: pip install 'bods-gql[bigquery]'"
+    ) from exc
 
 from bods_gql.converter.mapper import MappingResult
 from bods_gql.graph_schema.property_graph import (
